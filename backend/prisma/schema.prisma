@@ -1,0 +1,37 @@
+// Local prototype uses SQLite so the skeleton runs with zero setup.
+// For production, swap the datasource to Postgres:
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")   // e.g. postgresql://user:pass@host:5432/adepa
+// Everything else (models, queries) is unchanged — Prisma abstracts the driver.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id           String   @id @default(uuid())
+  name         String
+  subdomain    String   @unique
+  customDomain String?  @unique
+  plan         String   @default("trial")
+  createdAt    DateTime @default(now())
+  users        User[]
+}
+
+model User {
+  id           String   @id @default(uuid())
+  tenantId     String
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+  email        String
+  passwordHash String
+  name         String
+  role         String   @default("owner")
+  createdAt    DateTime @default(now())
+
+  @@unique([tenantId, email])
+}
