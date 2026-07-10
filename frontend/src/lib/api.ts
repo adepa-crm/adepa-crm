@@ -84,4 +84,8 @@ export const api = {
       headers: authHeaders(token),
       body: JSON.stringify({ stage }),
     }),
+  forgotPassword: (body: { subdomain: string; email: string }) =>
+    request<{ message: string }>("/auth/forgot-password", { method: "POST", body: JSON.stringify(body) }),
+  resetPassword: (body: { token: string; password: string }) =>
+    request<{ message: string }>("/auth/reset-password", { method: "POST", body: JSON.stringify(body) }),
 };

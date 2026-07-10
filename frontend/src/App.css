@@ -70,6 +70,38 @@ body {
   margin: 0;
 }
 
+.auth-success {
+  color: #0f6e56;
+  font-size: 13px;
+  margin: 0;
+}
+
+.auth-help {
+  color: #5f5e5a;
+  font-size: 13px;
+  margin: -4px 0 4px;
+  line-height: 1.5;
+}
+
+.password-field {
+  display: flex;
+  gap: 6px;
+}
+
+.password-field input {
+  flex: 1;
+}
+
+.password-toggle {
+  padding: 0 10px;
+  font-size: 12px;
+  border-radius: 8px;
+  border: 1px solid #d3d1c7;
+  background: white;
+  color: #5f5e5a;
+  cursor: pointer;
+}
+
 .auth-switch {
   font-size: 13px;
   color: #5f5e5a;

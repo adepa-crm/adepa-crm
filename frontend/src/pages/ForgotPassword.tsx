@@ -1,28 +1,24 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import PasswordField from "../components/PasswordField";
+import { Link } from "react-router-dom";
 import { api } from "../lib/api";
-import { useAuth } from "../lib/auth";
 
-export default function Login() {
-  const navigate = useNavigate();
-  const { setSession } = useAuth();
+export default function ForgotPassword() {
   const [subdomain, setSubdomain] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
+    setMessage("");
     setBusy(true);
     try {
-      const { token, user, tenant } = await api.login({ subdomain, email, password });
-      setSession(token, user, tenant);
-      navigate("/dashboard");
+      const { message } = await api.forgotPassword({ subdomain, email });
+      setMessage(message);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't sign in.");
+      setError(err instanceof Error ? err.message : "Something went wrong. Try again.");
     } finally {
       setBusy(false);
     }
@@ -31,7 +27,8 @@ export default function Login() {
   return (
     <div className="auth-screen">
       <form className="auth-card" onSubmit={handleSubmit}>
-        <h1>Log in to your workspace</h1>
+        <h1>Reset your password</h1>
+        <p className="auth-help">Enter your workspace and email — we'll send a reset link if there's an account.</p>
         <label>
           Workspace
           <input value={subdomain} onChange={(e) => setSubdomain(e.target.value)} placeholder="adepa" required />
@@ -40,17 +37,13 @@ export default function Login() {
           Email
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@business.com" required />
         </label>
-        <label>
-          Password
-          <PasswordField value={password} onChange={setPassword} required />
-        </label>
         {error && <p className="auth-error">{error}</p>}
-        <button type="submit" disabled={busy}>{busy ? "Signing in..." : "Log in"}</button>
+        {message && <p className="auth-success">{message}</p>}
+        <button type="submit" disabled={busy}>
+          {busy ? "Sending..." : "Send reset link"}
+        </button>
         <p className="auth-switch">
-          <Link to="/forgot-password">Forgot password?</Link>
-        </p>
-        <p className="auth-switch">
-          New here? <Link to="/signup">Create a workspace</Link>
+          <Link to="/login">Back to log in</Link>
         </p>
       </form>
     </div>

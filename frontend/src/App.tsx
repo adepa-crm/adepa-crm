@@ -2,7 +2,9 @@ import type { ReactElement } from "react";
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./lib/auth";
 import Dashboard from "./pages/Dashboard";
+import ForgotPassword from "./pages/ForgotPassword";
 import Login from "./pages/Login";
+import ResetPassword from "./pages/ResetPassword";
 import Sales from "./pages/Sales";
 import Signup from "./pages/Signup";
 import "./App.css";
@@ -21,6 +23,8 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route
             path="/dashboard"
             element={
