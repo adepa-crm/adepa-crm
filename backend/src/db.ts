@@ -29,6 +29,8 @@ export async function initSchema() {
       password_hash TEXT NOT NULL,
       name TEXT NOT NULL,
       role TEXT NOT NULL DEFAULT 'owner',
+      reset_token_hash TEXT,
+      reset_token_expires TIMESTAMPTZ,
       created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
       UNIQUE (tenant_id, email)
     );
@@ -56,5 +58,12 @@ export async function initSchema() {
 
     CREATE INDEX IF NOT EXISTS idx_customers_tenant ON customers(tenant_id);
     CREATE INDEX IF NOT EXISTS idx_leads_tenant ON leads(tenant_id);
+  `);
+
+  // Migration for tables created before reset-token support existed —
+  // CREATE TABLE IF NOT EXISTS above won't add columns to an existing table.
+  await pool.query(`
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_hash TEXT;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires TIMESTAMPTZ;
   `);
 }
