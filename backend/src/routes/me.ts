@@ -1,18 +1,18 @@
 import { Router } from "express";
-import { db } from "../db";
+import { pool } from "../db";
 import { requireAuth } from "../middleware/requireAuth";
 
 export const meRouter = Router();
 
 meRouter.get("/", requireAuth, async (req, res) => {
-  const row = db
-    .prepare(
-      `SELECT u.id as user_id, u.name as user_name, u.email, u.role,
-              t.id as tenant_id, t.name as tenant_name, t.subdomain, t.plan
-       FROM users u JOIN tenants t ON t.id = u.tenant_id
-       WHERE u.id = ? AND u.tenant_id = ?`
-    )
-    .get(req.userId, req.tenantId) as
+  const result = await pool.query(
+    `SELECT u.id as user_id, u.name as user_name, u.email, u.role,
+            t.id as tenant_id, t.name as tenant_name, t.subdomain, t.plan
+     FROM users u JOIN tenants t ON t.id = u.tenant_id
+     WHERE u.id = $1 AND u.tenant_id = $2`,
+    [req.userId, req.tenantId]
+  );
+  const row = result.rows[0] as
     | {
         user_id: string;
         user_name: string;

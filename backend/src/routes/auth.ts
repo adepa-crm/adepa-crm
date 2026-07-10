@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { Router } from "express";
 import { z } from "zod";
-import { db } from "../db";
+import { pool } from "../db";
 import { hashPassword, signToken, verifyPassword } from "../auth";
 
 export const authRouter = Router();
@@ -23,8 +23,8 @@ authRouter.post("/signup", async (req, res) => {
   }
   const { businessName, subdomain, name, email, password } = parsed.data;
 
-  const existing = db.prepare("SELECT id FROM tenants WHERE subdomain = ?").get(subdomain);
-  if (existing) {
+  const existing = await pool.query("SELECT id FROM tenants WHERE subdomain = $1", [subdomain]);
+  if (existing.rowCount && existing.rowCount > 0) {
     return res.status(409).json({ error: "That subdomain is taken. Try another." });
   }
 
@@ -32,16 +32,24 @@ authRouter.post("/signup", async (req, res) => {
   const tenantId = randomUUID();
   const userId = randomUUID();
 
-  const insertTenant = db.prepare(
-    "INSERT INTO tenants (id, name, subdomain) VALUES (?, ?, ?)"
-  );
-  const insertUser = db.prepare(
-    "INSERT INTO users (id, tenant_id, email, password_hash, name, role) VALUES (?, ?, ?, ?, ?, 'owner')"
-  );
-  db.transaction(() => {
-    insertTenant.run(tenantId, businessName, subdomain);
-    insertUser.run(userId, tenantId, email, passwordHash, name);
-  })();
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query(
+      "INSERT INTO tenants (id, name, subdomain) VALUES ($1, $2, $3)",
+      [tenantId, businessName, subdomain]
+    );
+    await client.query(
+      "INSERT INTO users (id, tenant_id, email, password_hash, name, role) VALUES ($1, $2, $3, $4, $5, 'owner')",
+      [userId, tenantId, email, passwordHash, name]
+    );
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
 
   const token = signToken({ userId, tenantId });
 
@@ -65,18 +73,20 @@ authRouter.post("/login", async (req, res) => {
   }
   const { subdomain, email, password } = parsed.data;
 
-  const tenant = db
-    .prepare("SELECT id, name, subdomain FROM tenants WHERE subdomain = ?")
-    .get(subdomain) as { id: string; name: string; subdomain: string } | undefined;
+  const tenantResult = await pool.query(
+    "SELECT id, name, subdomain FROM tenants WHERE subdomain = $1",
+    [subdomain]
+  );
+  const tenant = tenantResult.rows[0] as { id: string; name: string; subdomain: string } | undefined;
   if (!tenant) {
     return res.status(401).json({ error: "That workspace doesn't exist." });
   }
 
-  const user = db
-    .prepare(
-      "SELECT id, name, email, password_hash, role FROM users WHERE tenant_id = ? AND email = ?"
-    )
-    .get(tenant.id, email) as
+  const userResult = await pool.query(
+    "SELECT id, name, email, password_hash, role FROM users WHERE tenant_id = $1 AND email = $2",
+    [tenant.id, email]
+  );
+  const user = userResult.rows[0] as
     | { id: string; name: string; email: string; password_hash: string; role: string }
     | undefined;
   if (!user || !(await verifyPassword(password, user.password_hash))) {
