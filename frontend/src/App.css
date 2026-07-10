@@ -103,6 +103,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  text-decoration: none;
 }
 
 .sidebar-item.active {
@@ -143,8 +144,12 @@ body {
   cursor: pointer;
 }
 
+.content-body {
+  padding: 32px 40px;
+  overflow-y: auto;
+}
+
 .empty-state {
-  padding: 60px 40px;
   max-width: 480px;
 }
 
@@ -162,4 +167,134 @@ body {
   padding: 40px;
   text-align: center;
   color: #5f5e5a;
+}
+
+.sales-page section {
+  margin-bottom: 40px;
+}
+
+.sales-page h2 {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.pipeline-board {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pipeline-column {
+  background: #f4f2ec;
+  border-radius: 10px;
+  padding: 10px;
+  min-height: 80px;
+}
+
+.pipeline-column-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 500;
+  color: #5f5e5a;
+  margin-bottom: 8px;
+  padding: 0 2px;
+}
+
+.pipeline-count {
+  background: white;
+  border-radius: 10px;
+  padding: 0 6px;
+  font-size: 11px;
+}
+
+.lead-card {
+  background: white;
+  border: 1px solid #e2e0d6;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+
+.lead-title {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0 0 4px;
+}
+
+.lead-customer {
+  font-size: 12px;
+  color: #5f5e5a;
+  margin: 0 0 4px;
+}
+
+.lead-value {
+  font-size: 12px;
+  color: #0f6e56;
+  margin: 0 0 6px;
+}
+
+.lead-card select {
+  width: 100%;
+  font-size: 12px;
+  padding: 4px;
+  border-radius: 6px;
+  border: 1px solid #d3d1c7;
+}
+
+.inline-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.inline-form input,
+.inline-form select {
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d3d1c7;
+}
+
+.inline-form button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #0f6e56;
+  color: white;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.inline-form button:disabled {
+  opacity: 0.6;
+}
+
+.contacts-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.contacts-table th {
+  text-align: left;
+  color: #5f5e5a;
+  font-weight: 500;
+  padding: 8px;
+  border-bottom: 1px solid #e2e0d6;
+}
+
+.contacts-table td {
+  padding: 8px;
+  border-bottom: 1px solid #ede9dd;
+}
+
+.contacts-table .empty-row {
+  text-align: center;
+  color: #888780;
+  padding: 16px;
 }

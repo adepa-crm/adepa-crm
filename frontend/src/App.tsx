@@ -3,6 +3,7 @@ import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-d
 import { AuthProvider, useAuth } from "./lib/auth";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
+import Sales from "./pages/Sales";
 import Signup from "./pages/Signup";
 import "./App.css";
 
@@ -15,7 +16,7 @@ function RequireAuth({ children }: { children: ReactElement }) {
 
 export default function App() {
   return (
-    <Router>
+    <Router basename="/adepa">
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -25,6 +26,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <Dashboard />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/sales"
+            element={
+              <RequireAuth>
+                <Sales />
               </RequireAuth>
             }
           />
